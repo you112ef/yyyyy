@@ -1,0 +1,248 @@
+# Sperm Analysis System - Docker Compose
+# Author: Youssef Shitiwi (يوسف شتيوي)
+# Description: Complete deployment stack for sperm analysis system
+
+version: '3.8'
+
+services:
+  # ==============================================================================
+  # Backend API Service
+  # ==============================================================================
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: sperm-analysis-api
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=production
+      - DEBUG=false
+      - DATABASE_URL=postgresql://postgres:password@postgres:5432/sperm_analysis
+      - REDIS_URL=redis://redis:6379/0
+      - USE_DATABASE=true
+      - USE_REDIS=true
+      - MODEL_PATH=data/models/best/sperm_detection_best.pt
+      - MAX_CONCURRENT_ANALYSES=2
+      - MAX_UPLOAD_SIZE_MB=500
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - model_cache:/root/.cache
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - sperm-analysis-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health/simple"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # ==============================================================================
+  # Development API Service (Alternative)
+  # ==============================================================================
+  api-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    container_name: sperm-analysis-api-dev
+    ports:
+      - "8001:8000"
+    environment:
+      - ENVIRONMENT=development
+      - DEBUG=true
+      - USE_DATABASE=false
+      - USE_REDIS=false
+    volumes:
+      - .:/app
+      - model_cache:/root/.cache
+    networks:
+      - sperm-analysis-network
+    profiles:
+      - dev
+
+  # ==============================================================================
+  # Training Service
+  # ==============================================================================
+  training:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: training
+    container_name: sperm-analysis-training
+    ports:
+      - "8888:8888"
+    environment:
+      - JUPYTER_ENABLE_LAB=yes
+    volumes:
+      - .:/app
+      - ./data:/app/data
+      - model_cache:/root/.cache
+    networks:
+      - sperm-analysis-network
+    profiles:
+      - training
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+  # ==============================================================================
+  # PostgreSQL Database
+  # ==============================================================================
+  postgres:
+    image: postgres:15-alpine
+    container_name: sperm-analysis-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: sperm_analysis
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    ports:
+      - "5432:5432"
+    networks:
+      - sperm-analysis-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d sperm_analysis"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ==============================================================================
+  # Redis Cache
+  # ==============================================================================
+  redis:
+    image: redis:7-alpine
+    container_name: sperm-analysis-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - sperm-analysis-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ==============================================================================
+  # Nginx Reverse Proxy
+  # ==============================================================================
+  nginx:
+    image: nginx:alpine
+    container_name: sperm-analysis-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./docker/nginx.conf:/etc/nginx/nginx.conf
+      - ./docker/ssl:/etc/nginx/ssl
+      - nginx_logs:/var/log/nginx
+    depends_on:
+      - api
+    networks:
+      - sperm-analysis-network
+    profiles:
+      - production
+
+  # ==============================================================================
+  # Monitoring - Prometheus
+  # ==============================================================================
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: sperm-analysis-prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./docker/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    networks:
+      - sperm-analysis-network
+    profiles:
+      - monitoring
+
+  # ==============================================================================
+  # Monitoring - Grafana
+  # ==============================================================================
+  grafana:
+    image: grafana/grafana:latest
+    container_name: sperm-analysis-grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-simple-json-datasource
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./docker/grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./docker/grafana/datasources:/etc/grafana/provisioning/datasources
+    networks:
+      - sperm-analysis-network
+    profiles:
+      - monitoring
+
+  # ==============================================================================
+  # File Browser for Results Management
+  # ==============================================================================
+  filebrowser:
+    image: filebrowser/filebrowser:latest
+    container_name: sperm-analysis-files
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      - ./data:/srv
+      - ./docker/filebrowser.json:/.filebrowser.json
+    networks:
+      - sperm-analysis-network
+    profiles:
+      - management
+
+# ==============================================================================
+# Networks
+# ==============================================================================
+networks:
+  sperm-analysis-network:
+    driver: bridge
+
+# ==============================================================================
+# Volumes
+# ==============================================================================
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+  nginx_logs:
+    driver: local
+  model_cache:
+    driver: local

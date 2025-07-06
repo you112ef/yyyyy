@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- App Info -->
+    <string name="app_name">Sperm Analysis</string>
+    <string name="app_description">AI-Powered Computer-Assisted Sperm Analysis</string>
+    <string name="developer_name">Youssef Shitiwi (يوسف شتيوي)</string>
+    
+    <!-- Main Activity -->
+    <string name="no_analyses_title">No analyses yet</string>
+    <string name="no_analyses_message">Tap the + button to start your first sperm analysis</string>
+    <string name="add_analysis">Add new analysis</string>
+    <string name="refresh">Refresh</string>
+    <string name="settings">Settings</string>
+    
+    <!-- Video Selection -->
+    <string name="select_video_source">Select Video Source</string>
+    <string name="record_video">Record Video</string>
+    <string name="choose_from_gallery">Choose from Gallery</string>
+    <string name="browse_files">Browse Files</string>
+    <string name="select_video_file">Select Video File</string>
+    
+    <!-- Analysis -->
+    <string name="analysis_pending">Analysis Pending</string>
+    <string name="analysis_processing">Processing…</string>
+    <string name="analysis_completed">Completed</string>
+    <string name="analysis_failed">Failed</string>
+    <string name="analysis_cancelled">Cancelled</string>
+    
+    <!-- Analysis Details -->
+    <string name="analysis_name">Analysis Name</string>
+    <string name="video_file">Video File</string>
+    <string name="status">Status</string>
+    <string name="progress">Progress</string>
+    <string name="created_at">Created</string>
+    <string name="processing_time">Processing Time</string>
+    <string name="error_message">Error</string>
+    
+    <!-- Results -->
+    <string name="total_sperm">Total Sperm</string>
+    <string name="motile_sperm">Motile Sperm</string>
+    <string name="progressive_sperm">Progressive Sperm</string>
+    <string name="motility_percentage">Motility %</string>
+    <string name="progressive_percentage">Progressive %</string>
+    <string name="mean_vcl">Mean VCL</string>
+    <string name="mean_vsl">Mean VSL</string>
+    <string name="mean_lin">Mean LIN</string>
+    
+    <!-- Configuration -->
+    <string name="fps">Frame Rate (FPS)</string>
+    <string name="pixel_to_micron">Pixel to Micron</string>
+    <string name="confidence_threshold">Confidence Threshold</string>
+    <string name="iou_threshold">IoU Threshold</string>
+    <string name="min_track_length">Min Track Length</string>
+    <string name="enable_visualization">Enable Visualization</string>
+    <string name="export_trajectories">Export Trajectories</string>
+    
+    <!-- Actions -->
+    <string name="start_analysis">Start Analysis</string>
+    <string name="cancel_analysis">Cancel Analysis</string>
+    <string name="view_results">View Results</string>
+    <string name="download_results">Download Results</string>
+    <string name="share_results">Share Results</string>
+    <string name="delete_analysis">Delete Analysis</string>
+    
+    <!-- File Operations -->
+    <string name="downloading">Downloading…</string>
+    <string name="download_complete">Download Complete</string>
+    <string name="download_failed">Download Failed</string>
+    <string name="uploading">Uploading…</string>
+    <string name="upload_complete">Upload Complete</string>
+    <string name="upload_failed">Upload Failed</string>
+    
+    <!-- Permissions -->
+    <string name="permission_camera">Camera Permission</string>
+    <string name="permission_storage">Storage Permission</string>
+    <string name="permission_camera_message">Camera permission is needed to record videos for analysis</string>
+    <string name="permission_storage_message">Storage permission is needed to save and access video files</string>
+    <string name="permissions_granted">Permissions Granted</string>
+    <string name="permissions_denied">Some permissions were denied. App may not work correctly.</string>
+    
+    <!-- Errors -->
+    <string name="error_network">Network Error</string>
+    <string name="error_server">Server Error</string>
+    <string name="error_file_not_found">File Not Found</string>
+    <string name="error_invalid_video">Invalid Video File</string>
+    <string name="error_video_too_short">Video is too short (minimum 1 second)</string>
+    <string name="error_video_too_large">Video file is too large (maximum 500MB)</string>
+    <string name="error_no_camera">No camera app available</string>
+    <string name="error_processing_video">Error processing video</string>
+    <string name="error_analysis_not_found">Analysis not found</string>
+    
+    <!-- Validation -->
+    <string name="required_field">This field is required</string>
+    <string name="invalid_value">Invalid value</string>
+    
+    <!-- Settings -->
+    <string name="api_settings">API Settings</string>
+    <string name="server_url">Server URL</string>
+    <string name="connection_timeout">Connection Timeout</string>
+    <string name="auto_refresh">Auto Refresh</string>
+    <string name="notifications">Notifications</string>
+    <string name="about">About</string>
+    
+    <!-- About -->
+    <string name="version">Version</string>
+    <string name="build_date">Build Date</string>
+    <string name="developer">Developer</string>
+    <string name="contact">Contact</string>
+    <string name="website">Website</string>
+    <string name="license">License</string>
+    <string name="open_source_licenses">Open Source Licenses</string>
+    
+    <!-- Units -->
+    <string name="unit_seconds">seconds</string>
+    <string name="unit_frames">frames</string>
+    <string name="unit_percent">%</string>
+    <string name="unit_micron_per_second">μm/s</string>
+    <string name="unit_micron">μm</string>
+    <string name="unit_hertz">Hz</string>
+    <string name="unit_mb">MB</string>
+    
+    <!-- Formats -->
+    <string name="format_csv">CSV</string>
+    <string name="format_json">JSON</string>
+    <string name="format_pdf">PDF</string>
+    <string name="format_video">Video</string>
+    
+    <!-- Charts -->
+    <string name="chart_motility_distribution">Motility Distribution</string>
+    <string name="chart_velocity_parameters">Velocity Parameters</string>
+    <string name="chart_trajectory_plot">Trajectory Plot</string>
+    
+    <!-- Export -->
+    <string name="export_success">Export successful</string>
+    <string name="export_failed">Export failed</string>
+    <string name="export_csv">Export as CSV</string>
+    <string name="export_pdf">Export as PDF</string>
+    <string name="export_json">Export as JSON</string>
+    
+    <!-- Notifications -->
+    <string name="notification_analysis_complete">Analysis Complete</string>
+    <string name="notification_analysis_failed">Analysis Failed</string>
+    <string name="notification_upload_complete">Upload Complete</string>
+    <string name="notification_upload_failed">Upload Failed</string>
+</resources>
